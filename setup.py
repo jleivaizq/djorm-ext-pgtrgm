@@ -27,7 +27,7 @@ setup(
     author="José Antonio Leiva",
     author_email="jleivaizq@gmail.com",
     description="Django application with some addons regarding PostgreSQL trigram text comparison",
-    long_description=(read('README.rst') + '\n\n' + read('CHANGES.rst')),
+    long_description=(read('README.md') + '\n\n' + read('CHANGES.rst')),
     classifiers=[
         'Development Status :: 1 - Beta',
         'Framework :: Django',
