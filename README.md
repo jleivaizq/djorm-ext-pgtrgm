@@ -61,4 +61,4 @@ Development
 You can get the last version of djorm-ext-pgtrgm by doing a clone
 of its repository:
 
-    git clone git://github.com/jleivaizq/django-ext-pgtrgm.git
+    git clone git://github.com/jleivaizq/djorm-ext-pgtrgm.git
