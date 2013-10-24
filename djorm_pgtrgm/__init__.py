@@ -2,17 +2,9 @@ from django.db import backend
 from django.db import connection
 from django.db.models.fields import Field, subclassing
 from django.db.models.sql.constants import QUERY_TERMS
+from django.contrib.gis.db.models.sql.query import ALL_TERMS
 
 db_backends_allowed = ('postgresql', 'postgis')
-
-if isinstance(QUERY_TERMS, set):
-    QUERY_TERMS.add('similar')
-else:
-    QUERY_TERMS['similar'] = None
-
-connection.operators['similar'] = "%%%% %s"
-
-NEW_LOOKUP_TYPE = ('similar', )
 
 
 def get_prep_lookup(self, lookup_type, value):
@@ -46,8 +38,25 @@ def monkey_get_db_prep_lookup(cls):
             monkey_get_db_prep_lookup(new_cls)
 
 
-backend_allowed = reduce(lambda x, y: x in backend.__name_ or y, db_backends_allowed)
+backend_allowed = reduce(lambda x, y: x in backend.__name__ or y, db_backends_allowed)
+
 if backend_allowed:
+
+    if isinstance(QUERY_TERMS, set):
+        QUERY_TERMS.add('similar')
+    else:
+        QUERY_TERMS['similar'] = None
+
+    if backend_allowed == 'postgis':
+        if isinstance(ALL_TERMS, set):
+            ALL_TERMS.add('similar')
+        else:
+            ALL_TERMS['similar'] = None
+
+    connection.operators['similar'] = "%%%% %s"
+
+    NEW_LOOKUP_TYPE = ('similar', )
+
     monkey_get_db_prep_lookup(Field)
     if hasattr(Field, 'get_prep_lookup'):
         Field.get_prep_lookup_origin = Field.get_prep_lookup
