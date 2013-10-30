@@ -23,13 +23,13 @@ def read(*rnames):
 
 setup(
     name="djorm-ext-pgtrgm",
-    version="0.0.1",
+    version="0.1",
     author="José Antonio Leiva",
     author_email="jleivaizq@gmail.com",
     description="Django application with some addons regarding PostgreSQL trigram text comparison",
     long_description=(read('README.md') + '\n\n' + read('CHANGES.rst')),
     classifiers=[
-        'Development Status :: 1 - Beta',
+        'Development Status :: 4 - Beta',
         'Framework :: Django',
         'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
         'Programming Language :: Python :: 2',
@@ -38,8 +38,7 @@ setup(
     license="LGPL 3",
     keywords="django,querysets,lookup,pg_trgrm,similar,search",
     url='https://github.com/jleivaizq/djorm-ext-pgtrgm',
-    packages=find_packages(where='djorm_pgtrgm'),
-    package_dir={'': 'djorm_pgtrgm'},
+    packages=['djorm_pgtrgm'],
     include_package_data=True,
     zip_safe=False,
 )
