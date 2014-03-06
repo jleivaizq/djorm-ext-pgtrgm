@@ -60,11 +60,32 @@ Adds a new query set filter keyword to allow text searching.
 
     MyModel.objects.filter(field_name__similar='whatever')
 
-To ensure results ordered by similarity, try this:
+To ensure results ordered by similarity, you could do this:
 
     MyModel.objects.filter(field_name__similar='whatever').
                       extra(select={'distance': "similarity(name, 'whatever')"}).
                       order_by('-distance'))
+
+In a sake of brevity, you could use a provided `SimilarManager` that has a `filter_o`
+method.
+
+    from djorm_pgtrgm import SimilarManager
+
+    class MyModel(models.Model):
+        objects = SimilarManager()
+
+        # your fields
+        ...
+
+`filter_o` is a shortcut for the `filter + extra + order_by` in the snippet above.
+
+    MyModel.objects.filter_o(field_name__similar='whatever')
+
+So, this will return every similar `MyModel` instance with a `field_name` *similar*
+to `'whatever'` and sorted by the distance ot each intance's `field_name` value to target `'whatever'`. In addition, an extra field `field_name_distance` is added
+to each item in the queryset.
+
+
 
 Development
 -----------
