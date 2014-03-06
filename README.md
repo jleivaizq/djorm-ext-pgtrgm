@@ -29,18 +29,29 @@ than the current similarity threshold set by set_limit.
 Requeriments
 ------------
 
-Django 1.5 (or higher). It's possible that works with other versions lower 1.5
+- Django 1.5 (or higher). It's possible that works with other versions lower 1.5
+- Postgres `pg_trgm` extension. In debian/ubuntu: `sudo apt-get install postgres-contrib`
 
 
 Installation
 ------------
 
-In your settings.py
+- In your `settings.py`
 
     INSTALLED_APPS = (
 
         'djorm_pgtrgm',
     )
+
+- You need to *register* the extension in your database. Run `./manage.py dbshell` and then execute:
+
+    CREATE EXTENSION pg_trgm;
+
+- Optionally, you can create an index over a text column for the purpose of very fast similarity searches. For example, supose you will filter a lot over the field
+`description` of the model `myapp.Product`:
+
+    CREATE INDEX desctiption_trgm_idx ON myapp_product USING gist (description gist_trgm_ops);
+
 
 Usage
 -----------
