@@ -39,7 +39,7 @@ In your settings.py
 
     INSTALLED_APPS = (
 
-        'django_pgtrgm',
+        'djorm_pgtrgm',
     )
 
 Usage
