@@ -1,6 +1,8 @@
 from django.db import backend
 from django.db import connection
+from django.db import models
 from django.db.models.fields import Field, subclassing
+from django.db.models.query import QuerySet
 from django.db.models.sql.constants import QUERY_TERMS
 from django.contrib.gis.db.models.sql.query import ALL_TERMS
 
@@ -18,7 +20,8 @@ def get_prep_lookup(self, lookup_type, value):
 
 def get_db_prep_lookup(self, lookup_type, value, *args, **kwargs):
     try:
-        value_returned = self.get_db_prep_lookup_origin(lookup_type, value, *args, **kwargs)
+        value_returned = self.get_db_prep_lookup_origin(lookup_type, value,
+                                                        *args, **kwargs)
     except TypeError as e:  # Django 1.1
         if lookup_type in NEW_LOOKUP_TYPE:
             return [value]
@@ -38,7 +41,8 @@ def monkey_get_db_prep_lookup(cls):
             monkey_get_db_prep_lookup(new_cls)
 
 
-backend_allowed = reduce(lambda x, y: x in backend.__name__ or y, db_backends_allowed)
+backend_allowed = reduce(
+    lambda x, y: x in backend.__name__ or y, db_backends_allowed)
 
 if backend_allowed:
 
@@ -61,3 +65,24 @@ if backend_allowed:
     if hasattr(Field, 'get_prep_lookup'):
         Field.get_prep_lookup_origin = Field.get_prep_lookup
         Field.get_prep_lookup = get_prep_lookup
+
+
+class SimilarQuerySet(QuerySet):
+
+    def filter_o(self, **kwargs):
+        qs = super(SimilarQuerySet, self).filter(**kwargs)
+        for lookup, query in kwargs.items():
+            if lookup.endswith('__similar'):
+                field = lookup.replace('__similar', '')
+                select = {'%s_distance' % field: "similarity(%s, '%s')" % (field, query)}
+                qs = qs.extra(select=select).order_by('-%s_distance' % field)
+        return qs
+
+
+class SimilarManager(models.Manager):
+
+    def get_queryset(self):
+        return SimilarQuerySet(self.model, using=self._db)
+
+    def filter_o(self, **kwargs):
+        return self.get_queryset().filter_o(**kwargs)
