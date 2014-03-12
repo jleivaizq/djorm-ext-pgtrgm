@@ -70,7 +70,6 @@ if backend_allowed:
 class SimilarQuerySet(QuerySet):
 
     def filter_o(self, **kwargs):
-        import ipdb; ipdb.set_trace()
         qs = super(SimilarQuerySet, self).filter(**kwargs)
         for lookup, query in kwargs.items():
             query = query.replace('%', '%%')
