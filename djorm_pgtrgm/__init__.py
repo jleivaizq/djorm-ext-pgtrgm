@@ -3,8 +3,13 @@ from django.db import connection
 from django.db import models
 from django.db.models.fields import Field, subclassing
 from django.db.models.query import QuerySet
-from django.db.models.sql.constants import QUERY_TERMS
+try:
+    # Django 1.7 API for custom lookups
+    from django.db.models import Lookup
+except NameError:
+    from django.db.models.sql.constants import QUERY_TERMS
 from django.contrib.gis.db.models.sql.query import ALL_TERMS
+
 
 db_backends_allowed = ('postgresql', 'postgis')
 
@@ -44,8 +49,19 @@ def monkey_get_db_prep_lookup(cls):
 backend_allowed = reduce(
     lambda x, y: x in backend.__name__ or y, db_backends_allowed)
 
-if backend_allowed:
+if backend_allowed and 'Lookup' in locals():
+    # Use Django 1.7 API for registering a new lookup
+    class Similar(Lookup):
+        lookup_name = 'similar'
 
+        def as_sql(self, qn, connection):
+            lhs, lhs_params = self.process_lhs(qn, connection)
+            rhs, rhs_params = self.process_rhs(qn, connection)
+            params = lhs_params + rhs_params
+            return '%s %%%% %s' % (lhs, rhs), params
+    Field.register_lookup(Similar)
+elif backend_allowed:
+    # Old pre-Django 1.7 manual injection of lookup
     if isinstance(QUERY_TERMS, set):
         QUERY_TERMS.add('similar')
     else:
