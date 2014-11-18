@@ -6,7 +6,7 @@ from django.db.models.query import QuerySet
 try:
     # Django 1.7 API for custom lookups
     from django.db.models import Lookup
-except NameError:
+except ImportError:
     from django.db.models.sql.constants import QUERY_TERMS
 from django.contrib.gis.db.models.sql.query import ALL_TERMS
 
