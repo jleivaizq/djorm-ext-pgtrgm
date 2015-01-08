@@ -88,6 +88,7 @@ class SimilarQuerySet(QuerySet):
     def filter_o(self, **kwargs):
         qs = super(SimilarQuerySet, self).filter(**kwargs)
         for lookup, query in kwargs.items():
+            query = query.replace('%', '%%')
             if lookup.endswith('__similar'):
                 field = lookup.replace('__similar', '')
                 select = {'%s_distance' % field: "similarity(%s, '%s')" % (field, query)}
