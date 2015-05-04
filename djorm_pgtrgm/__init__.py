@@ -1,4 +1,3 @@
-from django.db import backend
 from django.db import connection
 from django.db import models
 from django.db.models.fields import Field, subclassing
@@ -45,9 +44,7 @@ def monkey_get_db_prep_lookup(cls):
         for new_cls in cls.__subclasses__():
             monkey_get_db_prep_lookup(new_cls)
 
-
-backend_allowed = reduce(
-    lambda x, y: x in backend.__name__ or y, db_backends_allowed)
+backend_allowed = (connection.vendor.lower() in db_backends_allowed)
 
 if backend_allowed and 'Lookup' in locals():
     # Use Django 1.7 API for registering a new lookup
