@@ -7,7 +7,10 @@ try:
     from django.db.models import Lookup
 except ImportError:
     from django.db.models.sql.constants import QUERY_TERMS
-from django.contrib.gis.db.models.sql.query import ALL_TERMS
+try:
+    from django.contrib.gis.db.models.lookups import gis_lookups as ALL_TERMS
+except ImportError:
+    from django.contrib.gis.db.models.sql.query import ALL_TERMS
 
 
 db_backends_allowed = ('postgresql', 'postgis')
