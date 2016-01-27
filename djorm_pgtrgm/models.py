@@ -91,8 +91,14 @@ class SimilarQuerySet(QuerySet):
             query = query.replace('%', '%%')
             if lookup.endswith('__similar'):
                 field = lookup.replace('__similar', '')
-                select = {'%s_distance' % field: "similarity(%s, '%s')" % (field, query)}
-                qs = qs.extra(select=select).order_by('-%s_distance' % field)
+                select = {
+                    '{}_distance'.format(field):
+                        'similarity({}, %s)'.format(field)
+                }
+                qs = qs.extra(
+                    select=select,
+                    select_params=[query]
+                ).order_by('-{}_distance'.format(field))
         return qs
 
 
