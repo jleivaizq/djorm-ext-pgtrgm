@@ -1,7 +1,11 @@
+from django.core.exceptions import ImproperlyConfigured
 from django.db import connection
 from django.db import models
 from django.db.models.fields import Field, subclassing
 from django.db.models.query import QuerySet
+
+db_backends_allowed = ('postgresql', 'postgis')
+
 try:
     # Django 1.7 API for custom lookups
     from django.db.models import Lookup
@@ -9,11 +13,11 @@ except ImportError:
     from django.db.models.sql.constants import QUERY_TERMS
 try:
     from django.contrib.gis.db.models.lookups import gis_lookups as ALL_TERMS
-except ImportError:
-    from django.contrib.gis.db.models.sql.query import ALL_TERMS
-
-
-db_backends_allowed = ('postgresql', 'postgis')
+except (ImportError, ImproperlyConfigured):
+    try:
+        from django.contrib.gis.db.models.sql.query import ALL_TERMS
+    except (ImportError, ImproperlyConfigured):
+        db_backends_allowed = ('postgresql',)
 
 
 def get_prep_lookup(self, lookup_type, value):
